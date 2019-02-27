@@ -22,6 +22,9 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=99,88
 #define SDCARD_MOSI_PIN  7
 #define SDCARD_SCK_PIN   14
 
+#define NUM_TO_PLAY 8
+int toplay[NUM_TO_PLAY] = {0, 0, 0, 0, 0, 0, 0, 0};
+
 void setup() {
   // put your setup code here, to run once:
   AudioMemory(8);
@@ -50,12 +53,19 @@ void setup() {
   /*set pizo pins*/
   pinMode(8, INPUT);
   pinMode(13, OUTPUT);
+
+  attachInterrupt(digitalPinToInterrupt(8), play1i, RISING );
+  attachInterrupt(digitalPinToInterrupt(5), play2i, RISING );
   
 }
 
+
 void block()
 {
+  digitalWrite(13, HIGH);
   while(sd.isPlaying() != 0);
+  for(int i = 0; i < NUM_TO_PLAY; i++) toplay[i] = 0;
+  digitalWrite(13, LOW);
   return;
 }
 
@@ -115,28 +125,29 @@ void play7(){
   return;
 }
 
+void play1i() {
+  toplay[1] = 1;
+  return;
+}
+
+void play2i() {
+  toplay[2] = 1;
+  return;
+}
+
+
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-  while(digitalRead(8) == LOW);
-  digitalWrite(13, HIGH);
-  play1();
-  block();
-  digitalWrite(13, LOW);
-  /*
-  play2();
-  block();
-  play3();
-  block();
-  play4();
-  block();
-  play5();
-  block();
-  play6();
-  block();
-  play7();
-  block();
-  */
+
+  if(1 == toplay[1])      {play1(); block();}
+  else if(1 == toplay[2]) {play2(); block();}
+  else if(1 == toplay[3]) {play3(); block();}
+  else if(1 == toplay[4]) {play4(); block();}
+  else if(1 == toplay[5]) {play5(); block();}
+  else if(1 == toplay[6]) {play6(); block();}
+  else if(1 == toplay[7]) {play7(); block();}
+  delay(1);
 
 }
