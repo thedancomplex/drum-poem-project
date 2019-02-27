@@ -35,7 +35,7 @@ void setup() {
   // This may wait forever if the SDA & SCL pins lack
   // pullup resistors
   sgtl5000_1.enable();
-  sgtl5000_1.volume(0.1);
+  sgtl5000_1.volume(0.3);
 
   SPI.setMOSI(SDCARD_MOSI_PIN);
   SPI.setSCK(SDCARD_SCK_PIN);
@@ -46,6 +46,10 @@ void setup() {
       delay(500);
     }
   }
+
+  /*set pizo pins*/
+  pinMode(8, INPUT);
+  pinMode(13, OUTPUT);
   
 }
 
@@ -114,8 +118,13 @@ void play7(){
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+  while(digitalRead(8) == LOW);
+  digitalWrite(13, HIGH);
   play1();
   block();
+  digitalWrite(13, LOW);
+  /*
   play2();
   block();
   play3();
@@ -128,5 +137,6 @@ void loop() {
   block();
   play7();
   block();
+  */
 
 }
