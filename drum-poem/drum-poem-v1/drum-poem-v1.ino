@@ -68,8 +68,8 @@ void setup() {
 
   //attachInterrupt(digitalPinToInterrupt(8), play1i, RISING );
   //attachInterrupt(digitalPinToInterrupt(5), play2i, RISING );
-  //attachInterrupt(digitalPinToInterrupt(8), play_next, RISING );
-  attachInterrupt(digitalPinToInterrupt(5), play_next, RISING );
+  attachInterrupt(digitalPinToInterrupt(8), play_next, RISING );
+  //attachInterrupt(digitalPinToInterrupt(5), play_next, RISING );
 
   /* Start volume timer */
   volumeTimer.begin(doVolumeTimer, 10000);
