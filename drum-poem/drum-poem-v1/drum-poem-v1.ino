@@ -23,7 +23,7 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=99,88
 #define SDCARD_SCK_PIN   14
 
 #define NUM_TO_PLAY 7
-int current_to_play = 1;
+int current_to_play = 0;
 int flag_play = 0;
 
 /* set volume timer for intergration */
@@ -65,11 +65,15 @@ void setup() {
   /*set pizo pins*/
   pinMode(8, INPUT);
   pinMode(13, OUTPUT);
+  pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
+  digitalWrite(3, LOW);
+  digitalWrite(2, LOW);
 
   //attachInterrupt(digitalPinToInterrupt(8), play1i, RISING );
   //attachInterrupt(digitalPinToInterrupt(5), play2i, RISING );
   attachInterrupt(digitalPinToInterrupt(8), play_next, RISING );
-  //attachInterrupt(digitalPinToInterrupt(5), play_next, RISING );
+  attachInterrupt(digitalPinToInterrupt(5), play_next, RISING );
 
   /* Start volume timer */
   volumeTimer.begin(doVolumeTimer, 10000);
@@ -88,7 +92,7 @@ void play_next(){
   if(tmp_vol < volume_min) tmp_vol = volume_min;
   sgtl5000_1.volume(tmp_vol);
   
-  Serial.println(tmp_vol);
+  //Serial.println(tmp_vol);
   return;
 }
 
@@ -179,26 +183,32 @@ void doVolumeTimer() {
   tmp_vol = tmp_vol / volume_intergrater_max;
   if(tmp_vol < volume_min) tmp_vol = volume_min;
   sgtl5000_1.volume(tmp_vol);
-  Serial.println(tmp_vol);
+  //Serial.println(tmp_vol);
   //yield();
   return;
 }
 void doPlayTimer() {
+  digitalWrite(3, HIGH);
   // put your main code here, to run repeatedly:
- if(1 == flag_play){
+  if(sd.isPlaying() == 0) digitalWrite(2, LOW);
+  else digitalWrite(2, HIGH);
+  if(1 == flag_play){
+  if(sd.isPlaying() == 0) current_to_play++;
   flag_play = 0;
+  Serial.println(current_to_play);
  
-  if(1 == current_to_play)      {play1();}
+  if   (1 == current_to_play)   {play1();}
   else if(2 == current_to_play) {play2();}
   else if(3 == current_to_play) {play3();}
   else if(4 == current_to_play) {play4();}
   else if(5 == current_to_play) {play5();}
   else if(6 == current_to_play) {play6();}
   else if(7 == current_to_play) {play7();}
+  
   block();
 
-  current_to_play++;
-  if(current_to_play > NUM_TO_PLAY) current_to_play = 1;
+  
+  if(current_to_play >= NUM_TO_PLAY) current_to_play = 0;
   
  }
  //yield();
@@ -210,5 +220,6 @@ void loop() {
   //interrupts();
   doPlayTimer();
   delay(1);
+  digitalWrite(3, LOW);
 
 }
