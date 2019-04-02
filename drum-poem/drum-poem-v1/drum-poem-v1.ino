@@ -35,7 +35,7 @@ double volume_intergrater = 0.0;
 double volume_intergrater_k_input = 0.01;
 double volume_intergrater_k_reduce = 0.001;
 #define volume_intergrater_max 1.0
-#define volume_min 0.3
+#define volume_min 0.5
 
 void setup() {
   // put your setup code here, to run once:
@@ -72,7 +72,7 @@ void setup() {
 
   //attachInterrupt(digitalPinToInterrupt(8), play1i, RISING );
   //attachInterrupt(digitalPinToInterrupt(5), play2i, RISING );
-  attachInterrupt(digitalPinToInterrupt(8), play_next, RISING );
+  attachInterrupt(digitalPinToInterrupt(8), play_reset, RISING );
   attachInterrupt(digitalPinToInterrupt(5), play_next, RISING );
 
   /* Start volume timer */
@@ -82,6 +82,7 @@ void setup() {
 int tmp = 0;
 void play_next(){
   flag_play = 1;
+  /*
   noInterrupts();
   double tmp_vol = volume_intergrater;
   tmp_vol = tmp_vol + volume_intergrater_k_input;
@@ -93,15 +94,40 @@ void play_next(){
   sgtl5000_1.volume(tmp_vol);
   
   //Serial.println(tmp_vol);
+  */
   return;
 }
+
+int breakPlay = 0;
+void play_reset(){
+  flag_play = 0;
+  int theDelay = 100;
+  sgtl5000_1.volume(0);
+  sd.stop();
+  noInterrupts();
+  current_to_play = 0;
+  breakPlay = 1;
+  for(int i = 0; i < 3; i++){
+    digitalWrite(3, HIGH);
+    delay(theDelay);
+    digitalWrite(3, LOW);
+    delay(theDelay);
+  }
+  interrupts();
+  return;
+}
+
+
 
 
 void block()
 {
   digitalWrite(13, HIGH);
   //while(sd.isPlaying() != 0);
-  while(sd.isPlaying() == 0);
+  while(sd.isPlaying() == 0){
+    if(breakPlay == 1) break;
+  }
+  breakPlay = 0;
   //for(int i = 0; i < NUM_TO_PLAY; i++) toplay[i] = 0;
   digitalWrite(13, LOW);
   return;
